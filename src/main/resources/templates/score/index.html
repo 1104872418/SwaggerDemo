@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="telephone=no" name="format-detection" />
+    <meta content="email=no" name="format-detection" />
+    <meta name="format-detection" content="telphone=no" />
+    <title>批发商城-个人中心-我的积分</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dropload.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
+    <script type="text/javascript" th:src="@{/js/sizeFont.js}"></script>
+</head>
+<body>
+<div class="outer mainBox">
+    <div class="inner">
+        <!--头部-->
+        <div class="topBox" th:if="${data!=null}">
+            <img th:src="@{/images/top_bg.png}" alt="" width="100%;">
+            <div class="topCon" th:object="${data}">
+                <input type="hidden" th:value="*{userId}" name="userId" id="userId"/>
+                <p class="topConTxt" th:text="*{enableScore}"></p>
+                <p class="topConTxt topConSamll">待用积分：<span class="topPayNum" th:text="*{standbyScore}"></span></p>
+            </div>
+        </div>
+        <div class="topBox" th:if="${data==null}">
+            <img th:src="@{/images/top_bg.png}" alt="" width="100%;">
+            <div class="topCon" th:object="${data}">
+                <p class="topConTxt">获取用户数据异常</p>
+            </div>
+        </div>
+        <!--end 头部-->
+        <div class="MainTit cf"><span class="MainTitLine"></span><h2>积分明细</h2></div>
+        <ul class="mainConList">
+
+        </ul>
+    </div>
+</div>
+<!-- jQuery1.7以上 或者 Zepto 二选一，不要同时都引用 -->
+<script type="text/javascript" th:src="@{/js/zepto.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/dropload.min.js}"></script>
+<script type="text/javascript">
+$(function(){
+    var uid=$("#userId").val();
+    var pageNum=0;
+    var totalPage=0;
+
+    var dropload=$('.inner').dropload({
+        domUp : {
+            domClass   : 'dropload-up',
+            domRefresh : '<div class="dropload-refresh">↓下拉刷新</div>',
+            domUpdate  : '<div class="dropload-update">↑释放更新</div>',
+            domLoad    : '<div class="dropload-load"><span class="loading"></span>加载中...</div>'
+        },
+        domDown : {
+            domClass   : 'dropload-down',
+            domRefresh : '<div class="dropload-refresh">↑上拉加载更多</div>',
+            domLoad    : '<div class="dropload-load"><span class="loading"></span>加载中...</div>',
+            domNoData  : '<div class="dropload-noData">暂无数据</div>'
+        },
+        autoload :true,
+        loadUpFn : function(me){
+            $('.mainConList').empty();
+            $.ajax({
+                type: 'GET',
+                url: '/api/score/list/'+$("#userId").val(),
+                dataType: 'json',
+                data:{"pageNum":1},
+                success: function(data){
+                    var result = '';
+                    $.each(data.data,function(i,item){
+                        result +=   '<li>'
+                            +'<p class="payTime">'+ item.tradeTime +'</p>'
+                            +'<p class="payTxt cf"><span class="payCon fl">'+item.sourceType+'</span><span class="payNum fr">'+item.score+'</span></p>'
+                            +'</li>';
+                    });
+
+                    $('.mainConList').html(result);
+                    // 每次数据加载完，必须重置
+                    me.resetload();
+                    pageNum=1;
+                },
+                error: function(xhr, type){
+                    alert('数据加载异常!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+
+            });
+        },
+        loadDownFn : function(me){
+            if(totalPage==0||pageNum<totalPage){
+                pageNum++;
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/score/list/'+$("#userId").val(),
+                    dataType: 'json',
+                    data:{"pageNum":pageNum},
+                    success: function(data){
+                        var result = '';
+                        $.each(data.data,function(i,item){
+                            result +=   '<li>'
+                                +'<p class="payTime">'+ item.tradeTime +'</p>'
+                                +'<p class="payTxt cf"><span class="payCon fl">'+item.sourceType+'</span><span class="payNum fr">'+item.score+'</span></p>'
+                                +'</li>';
+                        });
+                        // 为了测试，延迟1秒加载
+                        $('.mainConList').append(result);
+                        // 每次数据加载完，必须重置
+                        me.resetload();
+
+                        totalPage=data.total;
+                    },
+                    error: function(xhr, type){
+                        alert('数据加载异常！');
+                        // 即使加载出错，也得重置
+                        me.resetload();
+                    }
+                });
+            }else{
+                me.noData();
+                me.resetload();
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

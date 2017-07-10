@@ -1,0 +1,76 @@
+spring:
+  profiles:
+    active: dev
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+
+server:
+  port: 10086
+
+mybatis:
+    type-aliases-package: com.wholesale.entity
+    mapper-locations: classpath:com/wholesale/mapper/*.xml
+
+mapper:
+    mappers:
+        - com.wholesale.base.BaseMapper
+    not-empty: false
+    identity: MYSQL
+
+pagehelper:
+    helperDialect: mysql
+    reasonable: false
+    supportMethodsArguments: true
+    params: count=countSql
+
+---
+spring:
+  profiles: dev
+  datasource:
+#    url: jdbc:mysql://192.168.1.7:3302/wholesale?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true
+#    username: root
+#    password: PK5MIE2jOIQiBqA0uaGy11f0d6FTdOs9krYxWq0cIqlT2mz3kU/x1bsItjOXAYK2+h6QCz/7EI0wKs8kckRFXQ==
+    url: jdbc:mysql://localhost:3302/wholesale?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true
+    username: root
+    password: 123
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      filters: config
+      maxActive: 50
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      connectionProperties: config.decrypt=false;config.decrypt.key=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKp/ZKhlnaldbMKHiLksZ0hXEc8K3TUCxWlIwU/gliyLu3iVZgcti7cRescmgVwXcJxhJnEFINeJJzWC7VwUHnsCAwEAAQ==
+
+---
+spring:
+  profiles: prop
+  datasource:
+    url: jdbc:mysql://59031d60467b9.gz.cdb.myqcloud.com:13576/wholesale?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true
+    username: wholesale
+    password: lTbSdQfHsd8jOtz3tscJ42azkkbu6wn+x7D8H3v8BixkVwq06V0dSV7dGxcjVXIteMGyT2MVrR0RJT98If0RGg==
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      filters: config
+      maxActive: 50
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      connectionProperties: config.decrypt=true;config.decrypt.key=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKDqS1jMjNCyd1RY137MqxI0Pz+RBz1y/8xU2uQ+61kHKnPQsg+b+01k7oDHT9oVKiwRpI/eU1mEVK1EWIo+JgECAwEAAQ==
